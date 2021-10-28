@@ -7,7 +7,12 @@
 
 > Drag and drop so simple it hurts
 
-Browser support includes every sane browser and **IE7+**. <sub>_(Granted you polyfill the functional `Array` methods in ES5)_</sub>
+**This is a fork of the [original dragula](https://github.com/bevacqua/dragula/)**,
+as an attempt to modernize the project and keep it alive
+since the original is [largely unmaintained](https://github.com/bevacqua/dragula/issues/683).
+
+Browser support includes every *modern* browser. There is no support for **IE11** or below.
+If you need that kind of browser support, please use the [original dragula](https://github.com/bevacqua/dragula/).
 
 Framework support includes vanilla JavaScript, Angular, and React.
 
