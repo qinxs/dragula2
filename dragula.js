@@ -1,7 +1,7 @@
 'use strict';
 
 var emitter = require('contra/emitter');
-var crossvent = require('crossvent');
+
 var doc = document;
 var documentElement = doc.documentElement;
 
@@ -23,7 +23,7 @@ function dragula (initialContainers, options) {
   var _copy; // item used for copying
   var _renderTimer; // timer for setTimeout renderMirrorImage
   var _lastDropTarget = null; // last container item was over
-  var _grabbed; // holds mousedown context until first mousemove
+  var _grabbed; // holds pointerdown context until first pointermove
 
   var o = options || {};
   if (o.moves === void 0) { o.moves = always; }
@@ -64,19 +64,18 @@ function dragula (initialContainers, options) {
 
   function events (remove) {
     var op = remove ? 'remove' : 'add';
-    touchy(documentElement, op, 'mousedown', grab);
-    touchy(documentElement, op, 'mouseup', release);
+    documentElement[op + 'EventListener']('pointerdown', grab);
+    documentElement[op + 'EventListener']('pointerup', release);
   }
 
   function eventualMovements (remove) {
     var op = remove ? 'remove' : 'add';
-    touchy(documentElement, op, 'mousemove', startBecauseMouseMoved);
+    documentElement[op + 'EventListener']('pointermove', startBecauseMouseMoved);
   }
 
   function movements (remove) {
     var op = remove ? 'remove' : 'add';
-    crossvent[op](documentElement, 'selectstart', preventGrabbed); // IE8
-    crossvent[op](documentElement, 'click', preventGrabbed);
+    documentElement[op + 'EventListener']('click', preventGrabbed);
   }
 
   function destroy () {
@@ -105,7 +104,7 @@ function dragula (initialContainers, options) {
     }
     _grabbed = context;
     eventualMovements();
-    if (e.type === 'mousedown') {
+    if (e.type === 'pointerdown') {
       if (isInput(item)) { // see also: https://github.com/bevacqua/dragula/issues/208
         item.focus(); // fixes https://github.com/bevacqua/dragula/issues/176
       } else {
@@ -120,7 +119,7 @@ function dragula (initialContainers, options) {
     }
     if (whichMouseButton(e) === 0) {
       release({});
-      return; // when text is selected on an input and then dragged, mouseup doesn't fire. this is our only hope
+      return; // when text is selected on an input and then dragged, pointerup doesn't fire. this is our only hope
     }
 
     // truthy check fixes #239, equality fixes #207, fixes #501
@@ -439,7 +438,7 @@ function dragula (initialContainers, options) {
     _mirror.classList.add('gu-mirror');
 
     o.mirrorContainer.appendChild(_mirror);
-    touchy(documentElement, 'add', 'mousemove', drag);
+    documentElement.addEventListener('pointermove', drag);
     o.mirrorContainer.classList.add('gu-unselectable');
     drake.emit('cloned', _mirror, _item, 'mirror');
   }
@@ -447,7 +446,7 @@ function dragula (initialContainers, options) {
   function removeMirrorImage () {
     if (_mirror) {
       o.mirrorContainer.classList.remove('gu-unselectable');
-      touchy(documentElement, 'remove', 'mousemove', drag);
+      documentElement.removeEventListener('pointermove', drag);
       getParent(_mirror).removeChild(_mirror);
       _mirror = null;
     }
@@ -498,32 +497,6 @@ function dragula (initialContainers, options) {
 
   function isCopy (item, container) {
     return typeof o.copy === 'boolean' ? o.copy : o.copy(item, container);
-  }
-}
-
-function touchy (el, op, type, fn) {
-  var touch = {
-    mouseup: 'touchend',
-    mousedown: 'touchstart',
-    mousemove: 'touchmove'
-  };
-  var pointers = {
-    mouseup: 'pointerup',
-    mousedown: 'pointerdown',
-    mousemove: 'pointermove'
-  };
-  var microsoft = {
-    mouseup: 'MSPointerUp',
-    mousedown: 'MSPointerDown',
-    mousemove: 'MSPointerMove'
-  };
-  if (global.navigator.pointerEnabled) {
-    crossvent[op](el, pointers[type], fn);
-  } else if (global.navigator.msPointerEnabled) {
-    crossvent[op](el, microsoft[type], fn);
-  } else {
-    crossvent[op](el, touch[type], fn);
-    crossvent[op](el, type, fn);
   }
 }
 

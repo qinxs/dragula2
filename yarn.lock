@@ -1005,13 +1005,6 @@
     "safe-buffer" "^5.0.1"
     "sha.js" "^2.4.8"
 
-"crossvent@1.5.5":
-  "integrity" "sha1-rSCHjkkh6b5z2daXb4suzQ9xoLE="
-  "resolved" "https://registry.npmjs.org/crossvent/-/crossvent-1.5.5.tgz"
-  "version" "1.5.5"
-  dependencies:
-    "custom-event" "^1.0.0"
-
 "crypto-browserify@^3.0.0":
   "integrity" "sha512-fz4spIh+znjO2VjL+IdhEpRJ3YN6sMzITSBijk6FK2UvTqruSQW+/cCZTSNsMiZNvUeq0CqurF+dAbyiGOY6Wg=="
   "resolved" "https://registry.npmjs.org/crypto-browserify/-/crypto-browserify-3.12.0.tgz"
@@ -1052,11 +1045,6 @@
   "version" "0.4.1"
   dependencies:
     "array-find-index" "^1.0.1"
-
-"custom-event@^1.0.0":
-  "integrity" "sha1-XQKkaFCt8bSjF5RqOSj8y1v9BCU="
-  "resolved" "https://registry.npmjs.org/custom-event/-/custom-event-1.0.1.tgz"
-  "version" "1.0.1"
 
 "dash-ast@^1.0.0":
   "integrity" "sha512-Vy4dx7gquTeMcQR/hDkYLGUnwVil6vk4FOOct+djUnHOUWt+zJPJAaRIXaAFkPXtJjvlY7o3rfRu0/3hpnwoUA=="
@@ -4989,10 +4977,10 @@
   "resolved" "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   "version" "0.0.6"
 
-"uglify-js@3.11.0":
-  "integrity" "sha512-e1KQFRCpOxnrJsJVqDUCjURq+wXvIn7cK2sRAx9XL3HYLL9aezOP4Pb1+Y3/o693EPk111Yj2Q+IUXxcpHlygQ=="
-  "resolved" "https://registry.npmjs.org/uglify-js/-/uglify-js-3.11.0.tgz"
-  "version" "3.11.0"
+"uglify-js@^3":
+  "integrity" "sha512-rtPMlmcO4agTUfz10CbgJ1k6UAoXM2gWb3GoMPPZB/+/Ackf8lNWk11K4rYi2D0apgoFRLtQOZhb+/iGNJq26A=="
+  "resolved" "https://registry.npmjs.org/uglify-js/-/uglify-js-3.14.2.tgz"
+  "version" "3.14.2"
 
 "umd@^3.0.0":
   "integrity" "sha512-4IcGSufhFshvLNcMCV80UnQVlZ5pMOC8mvNPForqwA4+lzYQuetTESLDQkeLmihq8bRcnpbQa48Wb8Lh16/xow=="
