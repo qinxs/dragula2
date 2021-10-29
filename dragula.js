@@ -417,14 +417,12 @@ function dragula (initialContainers, options) {
   }
 
   function spillOver (el) {
-    if (el) {
-      el.classList.remove('gu-hide');
-    }
+    el?.classList.remove('gu-hide');
   }
 
   function spillOut (el) {
-    if (el && drake.dragging) {
-      el.classList.add('gu-hide');
+    if (drake.dragging) {
+      el?.classList.add('gu-hide');
     }
   }
 
