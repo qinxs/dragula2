@@ -11,7 +11,11 @@
 as an attempt to modernize the project and keep it alive
 since the original is [largely unmaintained](https://github.com/bevacqua/dragula/issues/683).
 
-Browser support includes every *modern* browser. There is no support for **IE11** or below.
+**It's currently a work in progress. If you're interested, star this repo and come back later**
+
+# Browser support
+
+Browser support of this fork includes every *modern* browser. There is no support for **IE11** or below.
 If you need that kind of browser support, please use the [original dragula](https://github.com/bevacqua/dragula/).
 
 Current target browser support:
@@ -49,7 +53,7 @@ Have you ever wanted a drag and drop library that just works? That doesn't just 
 You can get it on npm.
 
 ```shell
-npm install dragula --save
+npm install dragula2 --save
 ```
 
 Or a CDN.
