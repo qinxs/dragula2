@@ -18,7 +18,7 @@ since the original is [largely unmaintained](https://github.com/bevacqua/dragula
 Browser support of this fork includes every *modern* browser. There is no support for **IE11** or below.
 If you need that kind of browser support, please use the [original dragula](https://github.com/bevacqua/dragula/).
 
-Current target browser support:
+Indicative target browser support:
 * Chrome 55+, Edge 12+, Opera 42+
 * Firefox 59+
 * Safari 13+, iOS Safari 13+
