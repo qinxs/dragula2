@@ -14,6 +14,11 @@ since the original is [largely unmaintained](https://github.com/bevacqua/dragula
 Browser support includes every *modern* browser. There is no support for **IE11** or below.
 If you need that kind of browser support, please use the [original dragula](https://github.com/bevacqua/dragula/).
 
+Current target browser support:
+* Chrome 55+, Edge 12+, Opera 42+
+* Firefox 59+
+* Safari 13+, iOS Safari 13+
+
 Framework support includes vanilla JavaScript, Angular, and React.
 
 - Official [Angular bridge][8] for `dragula` [_(demo)_][10]
@@ -28,7 +33,7 @@ Try out the [demo][2]!
 
 # Inspiration
 
-Have you ever wanted a drag and drop library that just works? That doesn't just depend on bloated frameworks, that has great support? That actually understands where to place the elements when they are dropped? That doesn't need you to do a zillion things to get it to work? Well, so did I!
+Have you ever wanted a drag and drop library that just works? That doesn't just depend on bloated frameworks? That actually understands where to place the elements when they are dropped? That doesn't need you to do a zillion things to get it to work? Well, so did I!
 
 # Features
 
