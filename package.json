@@ -25,9 +25,6 @@
     "url": "https://github.com/bevacqua/dragula/issues"
   },
   "homepage": "https://github.com/bevacqua/dragula",
-  "dependencies": {
-    "contra": "1.9.4"
-  },
   "devDependencies": {
     "browserify": "16.5.2",
     "clean-css": "4.2.3",
