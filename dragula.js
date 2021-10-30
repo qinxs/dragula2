@@ -2,8 +2,7 @@
 
 var emitter = require('contra/emitter');
 
-var doc = document;
-var documentElement = doc.documentElement;
+var documentElement = document.documentElement;
 
 function dragula (initialContainers, options) {
   var len = arguments.length;
@@ -37,7 +36,7 @@ function dragula (initialContainers, options) {
   if (o.removeOnSpill === void 0) { o.removeOnSpill = false; }
   if (o.direction === void 0) { o.direction = 'vertical'; }
   if (o.ignoreInputTextSelection === void 0) { o.ignoreInputTextSelection = true; }
-  if (o.mirrorContainer === void 0) { o.mirrorContainer = doc.body; }
+  if (o.mirrorContainer === void 0) { o.mirrorContainer = document.body; }
 
   var drake = emitter({
     containers: o.containers,
@@ -131,7 +130,7 @@ function dragula (initialContainers, options) {
     if (o.ignoreInputTextSelection) {
       var clientX = e.clientX || 0;
       var clientY = e.clientY || 0;
-      var elementBehindCursor = doc.elementFromPoint(clientX, clientY);
+      var elementBehindCursor = document.elementFromPoint(clientX, clientY);
 
       if (isInput(elementBehindCursor)) {
         return;
@@ -259,7 +258,6 @@ function dragula (initialContainers, options) {
   }
 
   function drop (item, target) {
-    var parent = getParent(item);
     if (_copy && o.copySortSource && target === _source) {
       _item.remove();
     }
@@ -517,8 +515,8 @@ function whichMouseButton (e) {
 function getOffset (el) {
   var rect = el.getBoundingClientRect();
   return {
-    left: rect.left + scrollX,
-    top: rect.top + scrollY
+    left: rect.left + global.scrollX,
+    top: rect.top + global.scrollY
   };
 }
 
@@ -527,7 +525,7 @@ function getElementBehindPoint (point, x, y) {
   var state = point.className || '';
   var el;
   point.className += ' gu-hide';
-  el = doc.elementFromPoint(x, y);
+  el = document.elementFromPoint(x, y);
   point.className = state;
   return el;
 }
@@ -536,7 +534,7 @@ function never () { return false; }
 function always () { return true; }
 function getRectWidth (rect) { return rect.width || (rect.right - rect.left); }
 function getRectHeight (rect) { return rect.height || (rect.bottom - rect.top); }
-function getParent (el) { return el.parentNode === doc ? null : el.parentNode; }
+function getParent (el) { return el.parentNode === document ? null : el.parentNode; }
 function isInput (el) { return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || isEditable(el); }
 function isEditable (el) {
   if (!el) { return false; } // no parents were editable
