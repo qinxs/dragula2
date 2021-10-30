@@ -1,15 +1,22 @@
 'use strict';
 
-var emitter = require('contra/emitter');
-
 var documentElement = document.documentElement;
 
-function dragula (initialContainers, options) {
+class Dragula extends EventTarget {
+  constructor (initialContainers, options) {
+
+  super();
   var len = arguments.length;
   if (len === 1 && Array.isArray(initialContainers) === false) {
     options = initialContainers;
     initialContainers = [];
   }
+
+  var o = this.options = Object.assign({}, Dragula.defaultOptions, options);
+  o.containers = o.containers || initialContainers || [];
+  this.containers = o.containers;
+  this.dragging = false;
+
   var _mirror; // mirror image
   var _source; // source container
   var _item; // item being dragged
@@ -24,30 +31,7 @@ function dragula (initialContainers, options) {
   var _lastDropTarget = null; // last container item was over
   var _grabbed; // holds pointerdown context until first pointermove
 
-  var o = options || {};
-  if (o.moves === void 0) { o.moves = always; }
-  if (o.accepts === void 0) { o.accepts = always; }
-  if (o.invalid === void 0) { o.invalid = invalidTarget; }
-  if (o.containers === void 0) { o.containers = initialContainers || []; }
-  if (o.isContainer === void 0) { o.isContainer = never; }
-  if (o.copy === void 0) { o.copy = false; }
-  if (o.copySortSource === void 0) { o.copySortSource = false; }
-  if (o.revertOnSpill === void 0) { o.revertOnSpill = false; }
-  if (o.removeOnSpill === void 0) { o.removeOnSpill = false; }
-  if (o.direction === void 0) { o.direction = 'vertical'; }
-  if (o.ignoreInputTextSelection === void 0) { o.ignoreInputTextSelection = true; }
-  if (o.mirrorContainer === void 0) { o.mirrorContainer = document.body; }
-
-  var drake = emitter({
-    containers: o.containers,
-    start: manualStart,
-    end: end,
-    cancel: cancel,
-    remove: remove,
-    destroy: destroy,
-    canMove: canMove,
-    dragging: false
-  });
+  let drake = this;
 
   if (o.removeOnSpill === true) {
     drake.on('over', spillOver).on('out', spillOut);
@@ -55,7 +39,14 @@ function dragula (initialContainers, options) {
 
   events();
 
-  return drake;
+  Object.assign(this, {
+    start: manualStart,
+    end: end,
+    cancel: cancel,
+    remove: remove,
+    destroy: destroy,
+    canMove: canMove
+  });
 
   function isContainer (el) {
     return drake.containers.indexOf(el) !== -1 || o.isContainer(el);
@@ -205,7 +196,11 @@ function dragula (initialContainers, options) {
   function start (context) {
     if (isCopy(context.item, context.source)) {
       _copy = context.item.cloneNode(true);
-      drake.emit('cloned', _copy, context.item, 'copy');
+      drake.emit('cloned', {
+        clone: _copy,
+        original: context.item,
+        type: 'copy'
+      });
     }
 
     _source = context.source;
@@ -213,12 +208,13 @@ function dragula (initialContainers, options) {
     _initialSibling = _currentSibling = context.item.nextElementSibling;
 
     drake.dragging = true;
-    drake.emit('drag', _item, _source);
+    drake.emit('drag', {
+      element: _item,
+      source: _source
+    });
   }
 
-  function invalidTarget () {
-    return false;
-  }
+
 
   function end () {
     if (!drake.dragging) {
@@ -261,11 +257,23 @@ function dragula (initialContainers, options) {
     if (_copy && o.copySortSource && target === _source) {
       _item.remove();
     }
+
     if (isInitialPlacement(target)) {
-      drake.emit('cancel', item, _source, _source);
-    } else {
-      drake.emit('drop', item, target, _source, _currentSibling);
+      drake.emit('cancel', {
+        element: item,
+        container: _source,
+        source: _source
+      });
     }
+    else {
+      drake.emit('drop', {
+        element: item,
+        target,
+        source: _source,
+        sibling: _currentSibling
+      });
+    }
+
     cleanup();
   }
 
@@ -278,7 +286,12 @@ function dragula (initialContainers, options) {
     if (parent) {
       item.remove();
     }
-    drake.emit(_copy ? 'cancel' : 'remove', item, parent, _source);
+
+    drake.emit(_copy ? 'cancel' : 'remove', {
+      element: item,
+      container: parent,
+      source: _source
+    });
     cleanup();
   }
 
@@ -299,11 +312,23 @@ function dragula (initialContainers, options) {
         _source.insertBefore(item, _initialSibling);
       }
     }
+
     if (initial || reverts) {
-      drake.emit('cancel', item, _source, _source);
-    } else {
-      drake.emit('drop', item, parent, _source, _currentSibling);
+      drake.emit('cancel', {
+        element: item,
+        container: _source,
+        source: _source
+      });
     }
+    else {
+      drake.emit('drop', {
+        element: item,
+        target: parent,
+        source: _source,
+        sibling: _currentSibling
+      });
+    }
+
     cleanup();
   }
 
@@ -319,9 +344,13 @@ function dragula (initialContainers, options) {
     }
     drake.dragging = false;
     if (_lastDropTarget) {
-      drake.emit('out', item, _lastDropTarget, _source);
+      drake.emit('out', {
+        element: item,
+        container: _lastDropTarget,
+        source: _source
+      });
     }
-    drake.emit('dragend', item);
+    drake.emit('dragend', { element: item });
     _source = _item = _copy = _initialSibling = _currentSibling = _renderTimer = _lastDropTarget = null;
   }
 
@@ -410,9 +439,19 @@ function dragula (initialContainers, options) {
     ) {
       _currentSibling = reference;
       dropTarget.insertBefore(item, reference);
-      drake.emit('shadow', item, dropTarget, _source);
+      drake.emit('shadow', {
+        element: item,
+        container: dropTarget,
+        source: _source
+      });
     }
-    function moved (type) { drake.emit(type, item, _lastDropTarget, _source); }
+    function moved (type) {
+      drake.emit(type, {
+        element: item,
+        container: _lastDropTarget,
+        source: _source
+      });
+    }
     function over () { if (changed) { moved('over'); } }
     function out () { if (_lastDropTarget) { moved('out'); } }
   }
@@ -442,7 +481,11 @@ function dragula (initialContainers, options) {
     o.mirrorContainer.appendChild(_mirror);
     documentElement.addEventListener('pointermove', drag);
     o.mirrorContainer.classList.add('gu-unselectable');
-    drake.emit('cloned', _mirror, _item, 'mirror');
+    drake.emit('cloned', {
+      clone: _mirror,
+      original: _item,
+      type: 'mirror'
+    });
   }
 
   function removeMirrorImage () {
@@ -500,6 +543,49 @@ function dragula (initialContainers, options) {
   function isCopy (item, container) {
     return typeof o.copy === 'boolean' ? o.copy : o.copy(item, container);
   }
+} // End constructor
+
+  on (eventType, callback) {
+    this.addEventListener(eventType, evt => {
+      callback.call(this, ...Object.values(evt.detail));
+    });
+
+    return this;
+  }
+
+  off (eventType, callback) {
+    this.removeEventListener(eventType, callback);
+
+    return this;
+  }
+
+  emit (eventType, detail, ...args) {
+    if (detail instanceof Node) {
+      // Old syntax with positional arguments
+      detail = [detail, ...args];
+    }
+    let evt = new CustomEvent(eventType, { detail });
+    this.dispatchEvent(evt);
+    return this;
+  }
+
+  static defaultOptions = {
+    moves: always,
+    accepts: always,
+    invalid: invalidTarget,
+    isContainer: never,
+    copy: false,
+    copySortSource: false,
+    revertOnSpill: false,
+    removeOnSpill: false,
+    direction: 'vertical',
+    ignoreInputTextSelection: true,
+    mirrorContainer: document.body
+  }
+}
+
+function dragula (...args) {
+  return new Dragula(...args);
 }
 
 function whichMouseButton (e) {
@@ -532,6 +618,10 @@ function getElementBehindPoint (point, x, y) {
 
 function never () { return false; }
 function always () { return true; }
+function invalidTarget () {
+  return false;
+}
+
 function getRectWidth (rect) { return rect.width || (rect.right - rect.left); }
 function getRectHeight (rect) { return rect.height || (rect.bottom - rect.top); }
 function getParent (el) { return el.parentNode === document ? null : el.parentNode; }
