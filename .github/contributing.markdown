@@ -44,6 +44,8 @@ npm start
 
 ### Test
 
+For testing, we use [Web Test Runner](https://modern-web.dev/guides/test-runner/), which uses Mocha. Because the original Dragula used Tape and tape-run (which don't support ESM at the time), we use a little [shim](../test/lib/base.js) to be able to keep the syntax largely unchanged.
+
 Run the command below to execute all tests in a DevTools window through Electron. Note that the DevTools will get reloaded whenever your test files change, making tests a breeze!
 
 ```shell

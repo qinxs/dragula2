@@ -1,8 +1,7 @@
 'use strict';
 
-var test = require('tape');
-var events = require('./lib/events');
-var dragula = require('..');
+import test, {events} from "./lib/base.js";
+import dragula from "../dragula.js";
 
 test('.start() emits "cloned" for copies', function (t) {
   var div = document.createElement('div');
@@ -12,8 +11,7 @@ test('.start() emits "cloned" for copies', function (t) {
   document.body.appendChild(div);
   drake.on('cloned', cloned);
   drake.start(item);
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function cloned (copy, original, type) {
     if (type === 'copy') {
       t.notEqual(copy, item, 'copy is not a reference to item');
@@ -31,8 +29,7 @@ test('.start() emits "drag" for items', function (t) {
   document.body.appendChild(div);
   drake.on('drag', drag);
   drake.start(item);
-  t.plan(2);
-  t.end();
+  // t.plan(2);
   function drag (original, container) {
     t.equal(original, item, 'item is a reference to moving target');
     t.equal(container, div, 'container matches expected div');
@@ -50,8 +47,7 @@ test('.end() emits "cancel" when not moved', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   drake.end();
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend (original) {
     t.equal(original, item, 'item is a reference to moving target');
   }
@@ -75,8 +71,7 @@ test('.end() emits "drop" when moved', function (t) {
   events.raise(item, 'pointermove', { which: 1 });
   div2.appendChild(item);
   drake.end();
-  t.plan(4);
-  t.end();
+  // t.plan(4);
   function dragend (original) {
     t.equal(original, item, 'item is a reference to moving target');
   }
@@ -98,8 +93,7 @@ test('.remove() emits "remove" for items', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   drake.remove();
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend (original) {
     t.equal(original, item, 'item is a reference to moving target');
   }
@@ -120,8 +114,7 @@ test('.remove() emits "cancel" for copies', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   drake.remove();
-  t.plan(4);
-  t.end();
+  // t.plan(4);
   function dragend () {
     t.pass('dragend got invoked');
   }
@@ -143,8 +136,7 @@ test('.cancel() emits "cancel" when not moved', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   drake.cancel();
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend (original) {
     t.equal(original, item, 'item is a reference to moving target');
   }
@@ -168,8 +160,7 @@ test('.cancel() emits "drop" when not reverted', function (t) {
   events.raise(item, 'pointermove', { which: 1 });
   div2.appendChild(item);
   drake.cancel();
-  t.plan(4);
-  t.end();
+  // t.plan(4);
   function dragend (original) {
     t.equal(original, item, 'item is a reference to moving target');
   }
@@ -194,8 +185,7 @@ test('.cancel() emits "cancel" when reverts', function (t) {
   events.raise(item, 'pointermove', { which: 1 });
   div2.appendChild(item);
   drake.cancel();
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend (original) {
     t.equal(original, item, 'item is a reference to moving target');
   }
@@ -214,8 +204,7 @@ test('pointerdown emits "cloned" for mirrors', function (t) {
   drake.on('cloned', cloned);
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function cloned (copy, original, type) {
     if (type === 'mirror') {
       t.notEqual(copy, item, 'mirror is not a reference to item');
@@ -234,8 +223,7 @@ test('pointerdown emits "cloned" for copies', function (t) {
   drake.on('cloned', cloned);
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function cloned (copy, original, type) {
     if (type === 'copy') {
       t.notEqual(copy, item, 'copy is not a reference to item');
@@ -254,8 +242,7 @@ test('pointerdown emits "drag" for items', function (t) {
   drake.on('drag', drag);
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
-  t.plan(2);
-  t.end();
+  // t.plan(2);
   function drag (original, container) {
     t.equal(original, item, 'item is a reference to moving target');
     t.equal(container, div, 'container matches expected div');

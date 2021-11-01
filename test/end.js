@@ -1,17 +1,16 @@
 'use strict';
 
-var test = require('tape');
-var dragula = require('..');
+import test from "./lib/base.js";
+import dragula from "../dragula.js";
 
-test('end does not throw when not dragging', function (t) {
-  t.test('a single time', function once (st) {
+describe('end does not throw when not dragging', function (t) {
+  test('a single time', function once (st) {
     var drake = dragula();
     st.doesNotThrow(function () {
       drake.end();
     }, 'dragula ignores a single call to drake.end');
-    st.end();
   });
-  t.test('multiple times', function once (st) {
+  test('multiple times', function once (st) {
     var drake = dragula();
     st.doesNotThrow(function () {
       drake.end();
@@ -19,9 +18,7 @@ test('end does not throw when not dragging', function (t) {
       drake.end();
       drake.end();
     }, 'dragula ignores multiple calls to drake.end');
-    st.end();
   });
-  t.end();
 });
 
 test('when already dragging, .end() ends (cancels) previous drag', function (t) {
@@ -36,9 +33,8 @@ test('when already dragging, .end() ends (cancels) previous drag', function (t) 
   drake.on('dragend', end);
   drake.on('cancel', cancel);
   drake.end();
-  t.plan(4);
+  // t.plan(4);
   t.equal(drake.dragging, false, 'final state is: drake is not dragging');
-  t.end();
   function end (item) {
     t.equal(item, item1, 'dragend invoked with correct item');
   }
@@ -63,9 +59,8 @@ test('when already dragged, ends (drops) previous drag', function (t) {
   drake.on('dragend', end);
   drake.on('drop', drop);
   drake.end();
-  t.plan(5);
+  // t.plan(5);
   t.equal(drake.dragging, false, 'final state is: drake is not dragging');
-  t.end();
   function end (item) {
     t.equal(item, item1, 'dragend invoked with correct item');
   }

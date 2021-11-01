@@ -1,7 +1,5 @@
 'use strict';
 
-var documentElement = document.documentElement;
-
 class Dragula extends EventTarget {
   constructor (initialContainers, options) {
 
@@ -34,10 +32,12 @@ class Dragula extends EventTarget {
   let drake = this;
 
   if (o.removeOnSpill === true) {
-    drake.on('over', spillOver).on('out', spillOut);
+    this.on('over', spillOver).on('out', spillOut);
   }
 
-  events();
+  var documentElement = document.documentElement;
+  documentElement.addEventListener('pointerdown', grab);
+  documentElement.addEventListener('pointerup', release);
 
   Object.assign(this, {
     start: manualStart,
@@ -49,13 +49,7 @@ class Dragula extends EventTarget {
   });
 
   function isContainer (el) {
-    return drake.containers.indexOf(el) !== -1 || o.isContainer(el);
-  }
-
-  function events (remove) {
-    var op = remove ? 'remove' : 'add';
-    documentElement[op + 'EventListener']('pointerdown', grab);
-    documentElement[op + 'EventListener']('pointerup', release);
+    return drake.containers.includes(el) || o.isContainer(el);
   }
 
   function eventualMovements (remove) {
@@ -69,7 +63,8 @@ class Dragula extends EventTarget {
   }
 
   function destroy () {
-    events(true);
+    documentElement.removeEventListener('pointerdown', grab);
+    documentElement.removeEventListener('pointerup', release);
     release({});
   }
 
@@ -584,7 +579,7 @@ class Dragula extends EventTarget {
   }
 }
 
-function dragula (...args) {
+export default function dragula (...args) {
   return new Dragula(...args);
 }
 
@@ -601,8 +596,8 @@ function whichMouseButton (e) {
 function getOffset (el) {
   var rect = el.getBoundingClientRect();
   return {
-    left: rect.left + global.scrollX,
-    top: rect.top + global.scrollY
+    left: rect.left + window.scrollX,
+    top: rect.top + window.scrollY
   };
 }
 
@@ -632,5 +627,3 @@ function isEditable (el) {
   if (el.contentEditable === 'true') { return true; } // found a contentEditable element in the chain
   return isEditable(getParent(el)); // contentEditable is set to 'inherit'
 }
-
-module.exports = dragula;

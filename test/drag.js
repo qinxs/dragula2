@@ -1,10 +1,9 @@
 'use strict';
 
-var test = require('tape');
-var events = require('./lib/events');
-var dragula = require('..');
+import test, {events} from "./lib/base.js";
+import dragula from "../dragula.js";
 
-test('drag event gets emitted when clicking an item', function (t) {
+describe('drag event gets emitted when clicking an item', function () {
   testCase('works for left clicks', { which: 1 });
   testCase('works for wheel clicks', { which: 1 });
   testCase('works when clicking buttons by default', { which: 1 }, { tag: 'button', passes: true });
@@ -15,9 +14,8 @@ test('drag event gets emitted when clicking an item', function (t) {
   testCase('fails when clicking containers', { which: 1 }, { containerClick: true, passes: false });
   testCase('fails whenever invalid returns true', { which: 1 }, { passes: false, dragulaOpts: { invalid: always } });
   testCase('fails whenever moves returns false', { which: 1 }, { passes: false, dragulaOpts: { moves: never } });
-  t.end();
   function testCase (desc, eventOptions, options) {
-    t.test(desc, function subtest (st) {
+    test(desc, function subtest (st) {
       var o = options || {};
       var div = document.createElement('div');
       var item = document.createElement(o.tag || 'div');
@@ -28,11 +26,12 @@ test('drag event gets emitted when clicking an item', function (t) {
       drake.on('drag', drag);
       events.raise(o.containerClick ? div : item, 'pointerdown', eventOptions);
       events.raise(o.containerClick ? div : item, 'pointermove');
-      st.plan(passes ? 4 : 1);
+      // st.plan(passes ? 4 : 1);
       st.equal(drake.dragging, passes, desc + ': final state is drake is ' + (passes ? '' : 'not ') + 'dragging');
-      st.end();
+      // st.end();
+
       function drag (target, container) {
-        st[passes ? 'pass' : 'fail'](desc + ': drag event was emitted synchronously');
+        st.isOk(passes, desc + ': drag event was emitted synchronously');
         st.equal(target, item, desc + ': first argument is selected item');
         st.equal(container, div, desc + ': second argument is container');
       }
@@ -54,9 +53,8 @@ test('when already dragging, pointerdown/pointermove ends (cancels) previous dra
   drake.on('drag', drag);
   events.raise(item2, 'pointerdown', { which: 1 });
   events.raise(item2, 'pointermove', { which: 1 });
-  t.plan(7);
+  // t.plan(7);
   t.equal(drake.dragging, true, 'final state is drake is dragging');
-  t.end();
   function end (item) {
     t.equal(item, item1, 'dragend invoked with correct item');
   }
@@ -88,9 +86,8 @@ test('when already dragged, ends (drops) previous drag', function (t) {
   drake.on('drag', drag);
   events.raise(item2, 'pointerdown', { which: 1 });
   events.raise(item2, 'pointermove', { which: 1 });
-  t.plan(8);
+  // t.plan(8);
   t.equal(drake.dragging, true, 'final state is drake is dragging');
-  t.end();
   function end (item) {
     t.equal(item, item1, 'dragend invoked with correct item');
   }
@@ -120,9 +117,8 @@ test('when copying, emits cloned with the copy', function (t) {
   drake.on('drag', drag);
   events.raise(item2, 'pointerdown', { which: 1 });
   events.raise(item2, 'pointermove', { which: 1 });
-  t.plan(12);
+  // t.plan(12);
   t.equal(drake.dragging, true, 'final state is drake is dragging');
-  t.end();
   function cloned (copy, item) {
     t.notEqual(copy, item2, 'first argument is not exactly the target');
     t.equal(copy.tagName, item2.tagName, 'first argument has same tag as target');
@@ -145,7 +141,6 @@ test('when dragging, element gets gu-transit class', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   t.equal(item.className, 'gu-transit', 'item has gu-transit class');
-  t.end();
 });
 
 test('when dragging, body gets gu-unselectable class', function (t) {
@@ -157,7 +152,6 @@ test('when dragging, body gets gu-unselectable class', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   t.equal(document.body.className, 'gu-unselectable', 'body has gu-unselectable class');
-  t.end();
 });
 
 test('when dragging, element gets a mirror image for show', function (t) {
@@ -170,8 +164,7 @@ test('when dragging, element gets a mirror image for show', function (t) {
   drake.on('cloned', cloned);
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
-  t.plan(4);
-  t.end();
+  // t.plan(4);
   function cloned (mirror, target) {
     t.equal(item.className, 'gu-transit', 'item does not have gu-mirror class');
     t.equal(mirror.className, 'gu-mirror', 'mirror only has gu-mirror class');
@@ -193,8 +186,7 @@ test('when dragging, mirror element gets appended to configured mirrorContainer'
   drake.on('cloned', cloned);
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
-  t.plan(1);
-  t.end();
+  // t.plan(1);
   function cloned (mirror) {
     t.equal(mirror.parentNode, mirrorContainer, 'mirrors parent is the configured mirrorContainer');
   }
@@ -211,7 +203,6 @@ test('when dragging stops, element gets gu-transit class removed', function (t) 
   t.equal(item.className, 'gu-transit', 'item has gu-transit class');
   drake.end();
   t.equal(item.className, '', 'item has gu-transit class removed');
-  t.end();
 });
 
 test('when dragging stops, body becomes selectable again', function (t) {
@@ -225,7 +216,6 @@ test('when dragging stops, body becomes selectable again', function (t) {
   t.equal(document.body.className, 'gu-unselectable', 'body has gu-unselectable class');
   drake.end();
   t.equal(document.body.className, '', 'body got gu-unselectable class removed');
-  t.end();
 });
 
 test('when drag begins, check for copy option', function (t) {
@@ -242,8 +232,7 @@ test('when drag begins, check for copy option', function (t) {
   events.raise(item, 'pointerdown', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 });
   events.raise(item, 'pointermove', { which: 1 }); // ensure the copy method condition is only asserted once
-  t.plan(2);
-  t.end();
+  // t.plan(2);
   function checkCondition (el, source) {
     t.equal(el.className, 'copyable', 'dragged element classname is copyable');
     t.equal(source.className, 'contains', 'source container classname is contains');

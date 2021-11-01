@@ -1,17 +1,16 @@
 'use strict';
 
-var test = require('tape');
-var dragula = require('..');
+import test from "./lib/base.js";
+import dragula from "../dragula.js";
 
-test('destroy does not throw when not dragging, destroyed, or whatever', function (t) {
-  t.test('a single time', function once (st) {
+describe('destroy does not throw when not dragging, destroyed, or whatever', function () {
+  test('a single time', function once (st) {
     var drake = dragula();
     st.doesNotThrow(function () {
       drake.destroy();
     }, 'dragula bites into a single call to drake.destroy');
-    st.end();
   });
-  t.test('multiple times', function once (st) {
+  test('multiple times', function once (st) {
     var drake = dragula();
     st.doesNotThrow(function () {
       drake.destroy();
@@ -19,9 +18,7 @@ test('destroy does not throw when not dragging, destroyed, or whatever', functio
       drake.destroy();
       drake.destroy();
     }, 'dragula bites into multiple calls to drake.destroy');
-    st.end();
   });
-  t.end();
 });
 
 test('when dragging and destroy gets called, nothing happens', function (t) {
@@ -34,7 +31,6 @@ test('when dragging and destroy gets called, nothing happens', function (t) {
   drake.destroy();
   t.equal(div.children.length, 1, 'nothing happens');
   t.equal(drake.dragging, false, 'drake has stopped dragging');
-  t.end();
 });
 
 test('when dragging and destroy gets called, dragend event is emitted gracefully', function (t) {
@@ -46,8 +42,7 @@ test('when dragging and destroy gets called, dragend event is emitted gracefully
   drake.start(item);
   drake.on('dragend', dragend);
   drake.destroy();
-  t.plan(1);
-  t.end();
+  // t.plan(1);
   function dragend () {
     t.pass('dragend got called');
   }
@@ -66,8 +61,7 @@ test('when dragging a copy and destroy gets called, default does not revert', fu
   drake.on('drop', drop);
   drake.on('dragend', dragend);
   drake.destroy();
-  t.plan(4);
-  t.end();
+  // t.plan(4);
   function dragend () {
     t.pass('dragend got called');
   }
@@ -91,8 +85,7 @@ test('when dragging a copy and destroy gets called, revert is executed', functio
   drake.on('cancel', cancel);
   drake.on('dragend', dragend);
   drake.destroy();
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend () {
     t.pass('dragend got called');
   }

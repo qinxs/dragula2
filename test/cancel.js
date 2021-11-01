@@ -1,17 +1,17 @@
 'use strict';
 
-var test = require('tape');
-var dragula = require('..');
+import test from "./lib/base.js";
+import dragula from "../dragula.js";
 
-test('cancel does not throw when not dragging', function (t) {
-  t.test('a single time', function once (st) {
+describe('cancel does not throw when not dragging', function () {
+  test('a single time', function once (st) {
     var drake = dragula();
     st.doesNotThrow(function () {
       drake.cancel();
     }, 'dragula ignores a single call to drake.cancel');
-    st.end();
   });
-  t.test('multiple times', function once (st) {
+
+  test('multiple times', function once (st) {
     var drake = dragula();
     st.doesNotThrow(function () {
       drake.cancel();
@@ -19,9 +19,7 @@ test('cancel does not throw when not dragging', function (t) {
       drake.cancel();
       drake.cancel();
     }, 'dragula ignores multiple calls to drake.cancel');
-    st.end();
   });
-  t.end();
 });
 
 test('when dragging and cancel gets called, nothing happens', function (t) {
@@ -34,7 +32,6 @@ test('when dragging and cancel gets called, nothing happens', function (t) {
   drake.cancel();
   t.equal(div.children.length, 1, 'nothing happens');
   t.equal(drake.dragging, false, 'drake has stopped dragging');
-  t.end();
 });
 
 test('when dragging and cancel gets called, cancel event is emitted', function (t) {
@@ -47,8 +44,7 @@ test('when dragging and cancel gets called, cancel event is emitted', function (
   drake.on('cancel', cancel);
   drake.on('dragend', dragend);
   drake.cancel();
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend () {
     t.pass('dragend got called');
   }
@@ -71,8 +67,7 @@ test('when dragging a copy and cancel gets called, default does not revert', fun
   drake.on('drop', drop);
   drake.on('dragend', dragend);
   drake.cancel();
-  t.plan(4);
-  t.end();
+  // t.plan(4);
   function dragend () {
     t.pass('dragend got called');
   }
@@ -96,8 +91,7 @@ test('when dragging a copy and cancel gets called, revert is executed', function
   drake.on('cancel', cancel);
   drake.on('dragend', dragend);
   drake.cancel(true);
-  t.plan(3);
-  t.end();
+  // t.plan(3);
   function dragend () {
     t.pass('dragend got called');
   }
