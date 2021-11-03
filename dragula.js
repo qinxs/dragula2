@@ -10,8 +10,7 @@ class Dragula extends EventTarget {
   }
 
   var o = this.options = Object.assign({}, Dragula.defaultOptions, options);
-  o.containers = o.containers || initialContainers || [];
-  this.containers = o.containers;
+  this.containers = o.containers = o.containers || initialContainers || [];
   this.dragging = false;
 
   var _mirror; // mirror image
@@ -30,7 +29,7 @@ class Dragula extends EventTarget {
 
   let drake = this;
 
-  if (o.removeOnSpill === true) {
+  if (this.options.removeOnSpill === true) {
     this.on('over', spillOver).on('out', spillOut);
   }
 
@@ -48,7 +47,7 @@ class Dragula extends EventTarget {
   });
 
   function isContainer (el) {
-    return drake.containers.includes(el) || o.isContainer(el);
+    return drake.containers.includes(el) || drake.options.isContainer(el);
   }
 
   function eventualMovements (remove) {
@@ -107,12 +106,12 @@ class Dragula extends EventTarget {
     }
 
     // truthy check fixes #239, equality fixes #207, fixes #501
-    if ((e.clientX !== void 0 && Math.abs(e.clientX - _moveX) <= (o.slideFactorX || 0)) &&
-      (e.clientY !== void 0 && Math.abs(e.clientY - _moveY) <= (o.slideFactorY || 0))) {
+    if ((e.clientX !== void 0 && Math.abs(e.clientX - _moveX) <= (drake.options.slideFactorX || 0)) &&
+      (e.clientY !== void 0 && Math.abs(e.clientY - _moveY) <= (drake.options.slideFactorY || 0))) {
       return;
     }
 
-    if (o.ignoreInputTextSelection) {
+    if (drake.options.ignoreInputTextSelection) {
       var clientX = e.clientX || 0;
       var clientY = e.clientY || 0;
       var elementBehindCursor = document.elementFromPoint(clientX, clientY);
@@ -149,7 +148,7 @@ class Dragula extends EventTarget {
     }
     var handle = item;
     while (getParent(item) && isContainer(getParent(item)) === false) {
-      if (o.invalid(item, handle)) {
+      if (drake.options.invalid(item, handle)) {
         return;
       }
       item = getParent(item); // drag target should be a top element
@@ -161,11 +160,11 @@ class Dragula extends EventTarget {
     if (!source) {
       return;
     }
-    if (o.invalid(item, handle)) {
+    if (drake.options.invalid(item, handle)) {
       return;
     }
 
-    var movable = o.moves(item, source, handle, item.nextElementSibling);
+    var movable = drake.options.moves(item, source, handle, item.nextElementSibling);
     if (!movable) {
       return;
     }
@@ -236,10 +235,10 @@ class Dragula extends EventTarget {
     var elementBehindCursor = getElementBehindPoint(_mirror, clientX, clientY);
     var dropTarget = findDropTarget(elementBehindCursor, clientX, clientY);
 
-    if (dropTarget && ((_copy && o.copySortSource) || (!_copy || dropTarget !== _source))) {
+    if (dropTarget && ((_copy && drake.options.copySortSource) || (!_copy || dropTarget !== _source))) {
       drop(item, dropTarget);
     }
-    else if (o.removeOnSpill) {
+    else if (drake.options.removeOnSpill) {
       remove();
     }
     else {
@@ -248,7 +247,7 @@ class Dragula extends EventTarget {
   }
 
   function drop (item, target) {
-    if (_copy && o.copySortSource && target === _source) {
+    if (_copy && drake.options.copySortSource && target === _source) {
       _item.remove();
     }
 
@@ -293,7 +292,7 @@ class Dragula extends EventTarget {
     if (!drake.dragging) {
       return;
     }
-    var reverts = arguments.length > 0 ? revert : o.revertOnSpill;
+    var reverts = arguments.length > 0 ? revert : drake.options.revertOnSpill;
     var item = _copy || _item;
     var parent = getParent(item);
     var initial = isInitialPlacement(parent);
@@ -379,7 +378,7 @@ class Dragula extends EventTarget {
       if (initial) {
         return true; // should always be able to drop it right back where it was
       }
-      return o.accepts(_item, target, _source, reference);
+      return drake.options.accepts(_item, target, _source, reference);
     }
   }
 
@@ -407,7 +406,7 @@ class Dragula extends EventTarget {
       over();
     }
     var parent = getParent(item);
-    if (dropTarget === _source && _copy && !o.copySortSource) {
+    if (dropTarget === _source && _copy && !drake.options.copySortSource) {
       if (parent) {
         item.remove();
       }
@@ -417,7 +416,7 @@ class Dragula extends EventTarget {
     var immediate = getImmediateChild(dropTarget, elementBehindCursor);
     if (immediate !== null) {
       reference = getReference(dropTarget, immediate, clientX, clientY);
-    } else if (o.revertOnSpill === true && !_copy) {
+    } else if (drake.options.revertOnSpill === true && !_copy) {
       reference = _initialSibling;
       dropTarget = _source;
     } else {
@@ -472,9 +471,9 @@ class Dragula extends EventTarget {
     _mirror.classList.remove('gu-transit');
     _mirror.classList.add('gu-mirror');
 
-    o.mirrorContainer.appendChild(_mirror);
+    drake.options.mirrorContainer.appendChild(_mirror);
     documentElement.addEventListener('pointermove', drag);
-    o.mirrorContainer.classList.add('gu-unselectable');
+    drake.options.mirrorContainer.classList.add('gu-unselectable');
     drake.emit('cloned', {
       clone: _mirror,
       original: _item,
@@ -484,7 +483,7 @@ class Dragula extends EventTarget {
 
   function removeMirrorImage () {
     if (_mirror) {
-      o.mirrorContainer.classList.remove('gu-unselectable');
+      drake.options.mirrorContainer.classList.remove('gu-unselectable');
       documentElement.removeEventListener('pointermove', drag);
       _mirror.remove();
       _mirror = null;
@@ -503,7 +502,7 @@ class Dragula extends EventTarget {
   }
 
   function getReference (dropTarget, target, x, y) {
-    var horizontal = o.direction === 'horizontal';
+    var horizontal = drake.options.direction === 'horizontal';
     var reference = target !== dropTarget ? inside() : outside();
     return reference;
 
