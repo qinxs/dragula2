@@ -1,5 +1,7 @@
 'use strict';
 
+import dragula from "../dragula.js";
+
 var sortable = $('sortable');
 
 dragula([$('left-defaults'), $('right-defaults')]);
