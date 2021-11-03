@@ -6,8 +6,7 @@ class Dragula extends EventTarget {
   super();
   var len = arguments.length;
   if (len === 1 && Array.isArray(initialContainers) === false) {
-    options = initialContainers;
-    initialContainers = [];
+    [options, initialContainers] = [initialContainers, []];
   }
 
   var o = this.options = Object.assign({}, Dragula.defaultOptions, options);
@@ -565,10 +564,10 @@ class Dragula extends EventTarget {
   }
 
   static defaultOptions = {
-    moves: always,
-    accepts: always,
-    invalid: invalidTarget,
-    isContainer: never,
+    moves: _ => true,
+    accepts: _ => true,
+    invalid: _ => false,
+    isContainer: _ => false,
     copy: false,
     copySortSource: false,
     revertOnSpill: false,
@@ -611,14 +610,8 @@ function getElementBehindPoint (point, x, y) {
   return el;
 }
 
-function never () { return false; }
-function always () { return true; }
-function invalidTarget () {
-  return false;
-}
-
 function getParent (el) { return el.parentNode === document ? null : el.parentNode; }
-function isInput (el) { return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || isEditable(el); }
+function isInput (el) { return el?.matches("input, select, textarea") || isEditable(el); }
 function isEditable (el) {
   if (!el) { return false; } // no parents were editable
   if (el.contentEditable === 'false') { return false; } // stop the lookup
