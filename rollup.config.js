@@ -1,4 +1,5 @@
 import { terser } from "rollup-plugin-terser";
+import { getBabelOutputPlugin as babel } from '@rollup/plugin-babel';
 
 function bundle(format, {minify} = {}) {
 	let filename = "dragula";
@@ -11,18 +12,26 @@ function bundle(format, {minify} = {}) {
 		filename += ".min";
 	}
 
+	let plugins = [];
+
+	if (minify) {
+		plugins.push(
+			babel({
+				allowAllFormats: true,
+			}),
+			terser({
+				compress: true,
+				mangle: true
+			})
+		);
+	}
+
 	return {
 		file: `dist/${filename}.js`,
 		name: "dragula",
 		format: format,
 		sourcemap: format !== "esm",
-
-		plugins: [
-			minify? terser({
-				compress: true,
-				mangle: true
-			}) : undefined
-		]
+		plugins
 	};
 }
 

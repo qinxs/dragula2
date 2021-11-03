@@ -28,6 +28,7 @@
   "homepage": "https://github.com/bevacqua/dragula",
   "devDependencies": {
     "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@rollup/plugin-babel": "^5.3.0",
     "@web/test-runner": "^0.13.20",
     "clean-css": "4.2.3",
     "clean-css-cli": "^4.3.0",

@@ -23,6 +23,9 @@ Indicative target browser support:
 * Firefox 59+
 * Safari 13+, iOS Safari 13+
 
+The minified files use Babel to support the target set of browsers above.
+The unminified files use JS features that are supported in every modern browser, but possibly not multiple versions back.
+
 Framework support includes vanilla JavaScript, Angular, and React.
 
 - Official [Angular bridge][8] for `dragula` [_(demo)_][10]
