@@ -11,6 +11,12 @@ class Dragula extends EventTarget {
 
   var o = this.options = Object.assign({}, Dragula.defaultOptions, options);
   this.containers = o.containers = o.containers || initialContainers || [];
+
+  if (typeof o.copy !== 'function') {
+    let copy = o.copy;
+    o.copy = _ => copy;
+  }
+
   this.dragging = false;
 
   var _mirror; // mirror image
@@ -187,7 +193,7 @@ class Dragula extends EventTarget {
   }
 
   function start (context) {
-    if (isCopy(context.item, context.source)) {
+    if (o.copy(context.item, context.source)) {
       _copy = context.item.cloneNode(true);
       drake.emit('cloned', {
         clone: _copy,
@@ -531,10 +537,6 @@ class Dragula extends EventTarget {
     function resolve (after) {
       return after ? target.nextElementSibling : target;
     }
-  }
-
-  function isCopy (item, container) {
-    return typeof o.copy === 'boolean' ? o.copy : o.copy(item, container);
   }
 } // End constructor
 
