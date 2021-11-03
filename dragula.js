@@ -1,5 +1,7 @@
 'use strict';
 
+const documentElement = document.documentElement;
+
 class Dragula extends EventTarget {
   constructor (initialContainers, options) {
 
@@ -39,7 +41,6 @@ class Dragula extends EventTarget {
     this.on('over', spillOver).on('out', spillOut);
   }
 
-  var documentElement = document.documentElement;
   documentElement.addEventListener('pointerdown', grab);
   documentElement.addEventListener('pointerup', release);
 
@@ -379,7 +380,7 @@ class Dragula extends EventTarget {
       }
 
       var immediate = getImmediateChild(target, elementBehindCursor);
-      var reference = getReference(target, immediate, clientX, clientY);
+      var reference = getReference(target, immediate, clientX, clientY, drake.options.direction);
       var initial = isInitialPlacement(target, reference);
       if (initial) {
         return true; // should always be able to drop it right back where it was
@@ -421,7 +422,7 @@ class Dragula extends EventTarget {
     var reference;
     var immediate = getImmediateChild(dropTarget, elementBehindCursor);
     if (immediate !== null) {
-      reference = getReference(dropTarget, immediate, clientX, clientY);
+      reference = getReference(dropTarget, immediate, clientX, clientY, drake.options.direction);
     } else if (drake.options.revertOnSpill === true && !_copy) {
       reference = _initialSibling;
       dropTarget = _source;
@@ -496,48 +497,9 @@ class Dragula extends EventTarget {
     }
   }
 
-  function getImmediateChild (dropTarget, target) {
-    var immediate = target;
-    while (immediate !== dropTarget && getParent(immediate) !== dropTarget) {
-      immediate = getParent(immediate);
-    }
-    if (immediate === documentElement) {
-      return null;
-    }
-    return immediate;
-  }
 
-  function getReference (dropTarget, target, x, y) {
-    var horizontal = drake.options.direction === 'horizontal';
-    var reference = target !== dropTarget ? inside() : outside();
-    return reference;
 
-    function outside () { // slower, but able to figure out any position
-      var len = dropTarget.children.length;
-      var i;
-      var el;
-      var rect;
-      for (i = 0; i < len; i++) {
-        el = dropTarget.children[i];
-        rect = el.getBoundingClientRect();
-        if (horizontal && (rect.left + rect.width / 2) > x) { return el; }
-        if (!horizontal && (rect.top + rect.height / 2) > y) { return el; }
-      }
-      return null;
-    }
 
-    function inside () { // faster, but only available if dropped inside a child element
-      var rect = target.getBoundingClientRect();
-      if (horizontal) {
-        return resolve(x > rect.left + rect.width / 2);
-      }
-      return resolve(y > rect.top + rect.height / 2);
-    }
-
-    function resolve (after) {
-      return after ? target.nextElementSibling : target;
-    }
-  }
 } // End constructor
 
   on (eventType, callback) {
@@ -581,6 +543,49 @@ class Dragula extends EventTarget {
 
 export default function dragula (...args) {
   return new Dragula(...args);
+}
+
+function getImmediateChild (dropTarget, target) {
+  var immediate = target;
+  while (immediate !== dropTarget && getParent(immediate) !== dropTarget) {
+    immediate = getParent(immediate);
+  }
+  if (immediate === documentElement) {
+    return null;
+  }
+  return immediate;
+}
+
+function getReference (dropTarget, target, x, y, direction) {
+  var horizontal = direction === 'horizontal';
+  var reference = target !== dropTarget ? inside() : outside();
+  return reference;
+
+  function outside () { // slower, but able to figure out any position
+    var len = dropTarget.children.length;
+    var i;
+    var el;
+    var rect;
+    for (i = 0; i < len; i++) {
+      el = dropTarget.children[i];
+      rect = el.getBoundingClientRect();
+      if (horizontal && (rect.left + rect.width / 2) > x) { return el; }
+      if (!horizontal && (rect.top + rect.height / 2) > y) { return el; }
+    }
+    return null;
+  }
+
+  function inside () { // faster, but only available if dropped inside a child element
+    var rect = target.getBoundingClientRect();
+    if (horizontal) {
+      return resolve(x > rect.left + rect.width / 2);
+    }
+    return resolve(y > rect.top + rect.height / 2);
+  }
+
+  function resolve (after) {
+    return after ? target.nextElementSibling : target;
+  }
 }
 
 function whichMouseButton (e) {
