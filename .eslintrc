@@ -10,40 +10,40 @@
 		"sourceType": "module"
 	},
     "rules": {
-		"curly": 2,
-		"eqeqeq": 2,
-		"new-cap": 2,
-		"no-caller": 2,
-		"no-empty": 2,
-		"no-new": 2,
+		"curly": 1,
+		"eqeqeq": 1,
+		"new-cap": 1,
+		"no-caller": 1,
+		"no-empty": 1,
+		"no-new": 1,
 		"dot-notation": 0,
-		"no-undef": 2,
-		"no-unused-vars": 2,
+		"no-undef": 1,
+		"no-unused-vars": 1,
 		"no-cond-assign": [
-			2,
+			1,
 			"except-parens"
 		],
-		"no-eq-null": 2,
+		"no-eq-null": 1,
 		"strict": [
-			2,
+			1,
 			"function"
 		],
 		"wrap-iife": [
-			2,
+			1,
 			"any"
 		],
-		"no-unused-expressions": 2,
+		"no-unused-expressions": 1,
 		"no-use-before-define": [
-			2,
+			1,
 			{
 				"functions": false
 			}
 		],
 		"quotes": [
-			2,
+			1,
 			"single"
 		],
-		"no-invalid-this": 2,
+		"no-invalid-this": 1,
 		"indent": [
 			2,
 			2,
