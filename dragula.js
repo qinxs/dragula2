@@ -467,8 +467,8 @@ class Dragula extends EventTarget {
     }
     var rect = _item.getBoundingClientRect();
     _mirror = _item.cloneNode(true);
-    _mirror.style.width = getRectWidth(rect) + 'px';
-    _mirror.style.height = getRectHeight(rect) + 'px';
+    _mirror.style.width = rect.width + 'px';
+    _mirror.style.height = rect.height + 'px';
 
     _mirror.classList.remove('gu-transit');
     _mirror.classList.add('gu-mirror');
@@ -525,9 +525,9 @@ class Dragula extends EventTarget {
     function inside () { // faster, but only available if dropped inside a child element
       var rect = target.getBoundingClientRect();
       if (horizontal) {
-        return resolve(x > rect.left + getRectWidth(rect) / 2);
+        return resolve(x > rect.left + rect.width / 2);
       }
-      return resolve(y > rect.top + getRectHeight(rect) / 2);
+      return resolve(y > rect.top + rect.height / 2);
     }
 
     function resolve (after) {
@@ -617,8 +617,6 @@ function invalidTarget () {
   return false;
 }
 
-function getRectWidth (rect) { return rect.width || (rect.right - rect.left); }
-function getRectHeight (rect) { return rect.height || (rect.bottom - rect.top); }
 function getParent (el) { return el.parentNode === document ? null : el.parentNode; }
 function isInput (el) { return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || isEditable(el); }
 function isEditable (el) {
