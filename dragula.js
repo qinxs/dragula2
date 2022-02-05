@@ -34,6 +34,7 @@ class Dragula extends EventTarget {
   var _renderTimer; // timer for setTimeout renderMirrorImage
   var _lastDropTarget = null; // last container item was over
   var _grabbed; // holds pointerdown context until first pointermove
+  var _isHover; // is hovering on folder
 
   let drake = this;
 
@@ -258,7 +259,7 @@ class Dragula extends EventTarget {
       _item.remove();
     }
 
-    if (isInitialPlacement(target)) {
+    if (isInitialPlacement(target) && !_isHover) {
       drake.emit('cancel', {
         element: item,
         container: _source,
@@ -270,7 +271,8 @@ class Dragula extends EventTarget {
         element: item,
         target,
         source: _source,
-        sibling: _currentSibling
+        sibling: _currentSibling,
+        isHover: _isHover
       });
     }
 
@@ -338,6 +340,10 @@ class Dragula extends EventTarget {
     removeMirrorImage();
     if (item) {
       item.classList.remove('gu-transit');
+      if (_isHover) {
+        _currentSibling.classList.remove('gu-drop-overlay');
+        item.remove();
+      }
     }
     if (_renderTimer) {
       clearTimeout(_renderTimer);
@@ -435,15 +441,23 @@ class Dragula extends EventTarget {
     if (
       (reference === null && changed) ||
       reference !== item &&
-      reference !== item.nextElementSibling
+      (reference !== item.nextElementSibling || isFolder(reference))
     ) {
+      // console.log(reference)
+      if (isFolder(reference) && isHover(reference)) {
+        reference.classList.add('gu-drop-overlay');
+        _isHover = true;
+      } else {
+        _currentSibling && _currentSibling.classList.remove('gu-drop-overlay');
+        dropTarget.insertBefore(item, reference);
+        drake.emit('shadow', {
+          element: item,
+          container: dropTarget,
+          source: _source
+        });
+        _isHover = false;
+      }
       _currentSibling = reference;
-      dropTarget.insertBefore(item, reference);
-      drake.emit('shadow', {
-        element: item,
-        container: dropTarget,
-        source: _source
-      });
     }
     function moved (type) {
       drake.emit(type, {
@@ -454,6 +468,17 @@ class Dragula extends EventTarget {
     }
     function over () { if (changed) { moved('over'); } }
     function out () { if (_lastDropTarget) { moved('out'); } }
+    // hover moves to the directory
+    function isFolder(el) { return el ? el.querySelector(o.folderCss) !== null : false; }
+    function isHover(el) {
+      var siblingEle = el.previousElementSibling || el.nextElementSibling || el;
+      var horizontal = siblingEle.offsetTop === el.offsetTop;
+      var rect = el.getBoundingClientRect();
+      if (horizontal) {
+        return (clientX > rect.left + rect.width / 4) && (clientX < rect.left + rect.width * 3 / 4);
+      }
+      return (clientY > rect.top + rect.height / 4) && (clientY < rect.top + rect.height * 3 / 4);
+    }
   }
 
   function spillOver (el) {
@@ -537,7 +562,8 @@ class Dragula extends EventTarget {
     removeOnSpill: false,
     direction: 'vertical',
     ignoreInputTextSelection: true,
-    mirrorContainer: document.body
+    mirrorContainer: document.body,
+    folderCss: '[type=folder]'
   }
 }
 
