@@ -1,6 +1,10 @@
 'use strict';
 
 const documentElement = document.documentElement;
+var _autoScrollingInterval; // reference to auto scrolling
+// A simple requestAnimationFrame polyfill
+var raf = window.requestAnimationFrame || function(callback){ return setTimeout(callback, 1000 / 60); };
+var caf = window.cancelAnimationFrame || function(cafID){ clearTimeout(cafID); };
 
 class Dragula extends EventTarget {
   constructor (initialContainers, options) {
@@ -219,6 +223,7 @@ class Dragula extends EventTarget {
 
   function end () {
     if (!drake.dragging) {
+      caf(_autoScrollingInterval);
       return;
     }
     var item = _copy || _item;
@@ -336,6 +341,7 @@ class Dragula extends EventTarget {
 
   function cleanup () {
     var item = _copy || _item;
+    caf(_autoScrollingInterval);
     ungrab();
     removeMirrorImage();
     if (item) {
@@ -459,6 +465,9 @@ class Dragula extends EventTarget {
       }
       _currentSibling = reference;
     }
+
+    startScroll(_item, e, o);
+
     function moved (type) {
       drake.emit(type, {
         element: item,
@@ -478,6 +487,90 @@ class Dragula extends EventTarget {
         return (clientX > rect.left + rect.width / 4) && (clientX < rect.left + rect.width * 3 / 4);
       }
       return (clientY > rect.top + rect.height / 4) && (clientY < rect.top + rect.height * 3 / 4);
+    }
+
+    function getScrollContainer(node) {
+      if (node === null) { return null; }
+      // NOTE: Manually calculating height because IE's `clientHeight` isn't always
+      // reliable.
+      var nodeOuterHeight = parseFloat(window.getComputedStyle(node).getPropertyValue('height')) +
+        parseFloat(window.getComputedStyle(node).getPropertyValue('padding-top')) +
+        parseFloat(window.getComputedStyle(node).getPropertyValue('padding-bottom'));
+      if (node.scrollHeight > Math.ceil(nodeOuterHeight)) { return node; }
+
+      var REGEX_BODY_HTML = new RegExp('(body|html)', 'i');
+
+      if (!REGEX_BODY_HTML.test(node.parentNode.tagName)) { return getScrollContainer(node.parentNode); }
+
+      return null;
+    }
+
+    function startAutoScrolling(node, amount, direction) {
+      _autoScrollingInterval = raf(function() {
+        if (!drake.dragging) {
+          return;
+        }
+        startAutoScrolling(node, amount, direction);
+      });
+
+      return node[direction] += (amount * 0.25);
+    }
+
+    function startScroll(item, event, options) {
+      var scrollingElement = null;
+      var scrollEdge = options.scrollEdge;
+      var scrollSpeed = 20;
+      var scrollContainer = getScrollContainer(item);
+      var pageX = null;
+      var pageY = null;
+
+      if (event.touches) {
+        pageX = event.touches[0].pageX;
+        pageY = event.touches[0].pageY;
+      } else {
+        pageX = event.pageX;
+        pageY = event.pageY;
+      }
+
+      caf(_autoScrollingInterval);
+
+      // If a container contains the list that is scrollable
+      if (scrollContainer) {
+
+        // Scrolling vertically
+        if (pageY - getOffset(scrollContainer).top < scrollEdge) {
+          startAutoScrolling(scrollContainer, -scrollSpeed, 'scrollTop');
+        } else if ((getOffset(scrollContainer).top + scrollContainer.getBoundingClientRect().height) - pageY < scrollEdge) {
+          startAutoScrolling(scrollContainer, scrollSpeed, 'scrollTop');
+        }
+
+        // Scrolling horizontally
+        if (pageX - scrollContainer.getBoundingClientRect().left < scrollEdge) {
+          startAutoScrolling(scrollContainer, -scrollSpeed, 'scrollLeft');
+        } else if ((getOffset(scrollContainer).left + scrollContainer.getBoundingClientRect().width) - pageX < scrollEdge) {
+          startAutoScrolling(scrollContainer, scrollSpeed, 'scrollLeft');
+        }
+
+      // If the window contains the list
+      } else {
+        scrollingElement = document.scrollingElement || document.documentElement || document.body;
+
+        // Scrolling vertically
+        // NOTE: Using `window.pageYOffset` here because IE doesn't have `window.scrollY`.
+        if ((pageY - window.pageYOffset) < scrollEdge) {
+          startAutoScrolling(scrollingElement, -scrollSpeed, 'scrollTop');
+        } else if ((window.innerHeight - (pageY - window.pageYOffset)) < scrollEdge) {
+          startAutoScrolling(scrollingElement, scrollSpeed, 'scrollTop');
+        }
+
+        // Scrolling horizontally
+        // NOTE: Using `window.pageXOffset` here because IE doesn't have `window.scrollX`.
+        if ((pageX - window.pageXOffset) < scrollEdge) {
+          startAutoScrolling(scrollingElement, -scrollSpeed, 'scrollLeft');
+        } else if ((window.innerWidth - (pageX - window.pageXOffset)) < scrollEdge) {
+          startAutoScrolling(scrollingElement, scrollSpeed, 'scrollLeft');
+        }
+      }
     }
   }
 
@@ -563,7 +656,8 @@ class Dragula extends EventTarget {
     direction: 'vertical',
     ignoreInputTextSelection: true,
     mirrorContainer: document.body,
-    folderCss: '[type=folder]'
+    folderCss: '[type=folder]',
+    scrollEdge: 36
   }
 }
 
