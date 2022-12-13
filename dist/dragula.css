@@ -1,0 +1,24 @@
+.gu-mirror {
+	position: fixed !important;
+	margin: 0 !important;
+	z-index: 9999 !important;
+	opacity: 0.8;
+}
+
+.gu-hide {
+	display: none !important;
+}
+
+.gu-unselectable {
+	user-select: none !important;
+}
+
+.gu-transit {
+	opacity: 0.2;
+}
+
+.gu-drop-overlay {
+  background-color: #d3ece7;
+  border: 1px solid #75c3b4;
+  border-radius: 2px;
+}
