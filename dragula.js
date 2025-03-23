@@ -37,7 +37,7 @@ class Dragula extends EventTarget {
   var _copy; // item used for copying
   var _renderTimer; // timer for setTimeout renderMirrorImage
   var _lastDropTarget = null; // last container item was over
-  var _grabbed; // holds pointerdown context until first pointermove
+  var _grabbed; // holds mousedown context until first mousemove
   var _isHover; // is hovering on folder
 
   let drake = this;
@@ -46,8 +46,8 @@ class Dragula extends EventTarget {
     this.on('over', spillOver).on('out', spillOut);
   }
 
-  documentElement.addEventListener('pointerdown', grab);
-  documentElement.addEventListener('pointerup', release);
+  documentElement.addEventListener('mousedown', grab);
+  documentElement.addEventListener('mouseup', release);
 
   Object.assign(this, {
     start: manualStart,
@@ -64,7 +64,7 @@ class Dragula extends EventTarget {
 
   function eventualMovements (remove) {
     var op = remove ? 'remove' : 'add';
-    documentElement[op + 'EventListener']('pointermove', startBecauseMouseMoved);
+    documentElement[op + 'EventListener']('mousemove', startBecauseMouseMoved);
   }
 
   function movements (remove) {
@@ -73,8 +73,8 @@ class Dragula extends EventTarget {
   }
 
   function destroy () {
-    documentElement.removeEventListener('pointerdown', grab);
-    documentElement.removeEventListener('pointerup', release);
+    documentElement.removeEventListener('mousedown', grab);
+    documentElement.removeEventListener('mouseup', release);
     release({});
   }
 
@@ -99,7 +99,7 @@ class Dragula extends EventTarget {
     }
     _grabbed = context;
     eventualMovements();
-    if (e.type === 'pointerdown') {
+    if (e.type === 'mousedown') {
       if (isInput(item)) { // see also: https://github.com/bevacqua/dragula/issues/208
         item.focus(); // fixes https://github.com/bevacqua/dragula/issues/176
       } else {
@@ -114,7 +114,7 @@ class Dragula extends EventTarget {
     }
     if (whichMouseButton(e) === 0) {
       release({});
-      return; // when text is selected on an input and then dragged, pointerup doesn't fire. this is our only hope
+      return; // when text is selected on an input and then dragged, mouseup doesn't fire. this is our only hope
     }
 
     // truthy check fixes #239, equality fixes #207, fixes #501
@@ -597,7 +597,7 @@ class Dragula extends EventTarget {
     _mirror.classList.add('gu-mirror');
 
     drake.options.mirrorContainer.appendChild(_mirror);
-    documentElement.addEventListener('pointermove', drag);
+    documentElement.addEventListener('mousemove', drag);
     drake.options.mirrorContainer.classList.add('gu-unselectable');
     drake.emit('cloned', {
       clone: _mirror,
@@ -609,7 +609,7 @@ class Dragula extends EventTarget {
   function removeMirrorImage () {
     if (_mirror) {
       drake.options.mirrorContainer.classList.remove('gu-unselectable');
-      documentElement.removeEventListener('pointermove', drag);
+      documentElement.removeEventListener('mousemove', drag);
       _mirror.remove();
       _mirror = null;
     }
